@@ -6,22 +6,33 @@
 <title>Retro Royale</title>
 <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
 <style>
-* { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; user-select: none; }
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
 body, html { width: 100%; height: 100%; overflow: hidden; background: #0d1017; color: #fff; }
 
 .screen {
-position: fixed; inset: 0;
-width: 100%; height: 100%;
-background-size: cover; background-position: center;
+position: fixed;
+inset: 0;
+width: 100%;
+height: 100%;
+background-size: cover;
+background-position: center;
+display: none;
 }
-.hidden { display: none !important; }
+.screen.active-flex {
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+gap: 14px;
+}
+.screen.active-block {
+display: block;
+}
 
 #s1 {
-display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
 background-image: linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.68)), url('./splash_bg.png.jpg');
 }
 #s2 {
-display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
 background-image: linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.68)), url('./login_bg.png.jpg');
 }
 #s3 {
@@ -35,14 +46,12 @@ background: #ffb300; color: #111;
 }
 .btn-blue { background: #1e88e5; color: #fff; }
 
-/* Top Bar - FF Style Corners */
 .top-hud {
 position: absolute; top: 14px; left: 14px; right: 14px;
 display: flex; justify-content: space-between; align-items: center;
-z-index: 20; pointer-events: none;
+z-index: 20;
 }
 .hud-pill {
-pointer-events: auto;
 background: rgba(12, 16, 26, 0.78);
 border: 1px solid rgba(255, 255, 255, 0.16);
 padding: 8px 14px; border-radius: 8px;
@@ -51,7 +60,6 @@ display: flex; align-items: center; gap: 10px;
 .char-badge-title { font-weight: bold; color: #ffd54f; font-size: 15px; }
 .char-badge-skill { font-size: 12px; color: #cfd8dc; }
 
-/* Left Side FF Character Button */
 .left-dock {
 position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
 display: flex; flex-direction: column; gap: 10px; z-index: 20;
@@ -64,18 +72,18 @@ border-radius: 10px; color: #fff; cursor: pointer;
 display: flex; flex-direction: column; align-items: center; gap: 4px;
 font-weight: bold; font-size: 12px;
 }
-.ff-side-btn:hover { background: rgba(255, 179, 0, 0.2); }
 
-/* Character Drawer / Side Panel */
 .char-drawer {
 position: absolute; left: 124px; top: 76px; bottom: 96px;
 width: 250px; max-width: calc(100vw - 140px);
-background: rgba(12, 16, 26, 0.9);
+background: rgba(12, 16, 26, 0.92);
 border: 1px solid rgba(255, 179, 0, 0.45);
 border-radius: 12px; padding: 12px;
-display: flex; flex-direction: column; gap: 10px;
+display: none; flex-direction: column; gap: 10px;
 z-index: 25; overflow-y: auto;
 }
+.char-drawer.open { display: flex; }
+
 .drawer-header {
 display: flex; justify-content: space-between; align-items: center;
 border-bottom: 1px solid rgba(255,255,255,0.12); padding-bottom: 8px;
@@ -107,7 +115,6 @@ overflow: hidden;
 .char-name { font-weight: bold; font-size: 14px; }
 .char-skill-sub { font-size: 11px; color: #b0bec5; }
 
-/* Center-Right 3D Stage */
 .stage-3d {
 position: absolute; inset: 0;
 width: 100%; height: 100%;
@@ -123,7 +130,6 @@ background: rgba(0,0,0,0.72); color: #ffd54f; padding: 6px 12px;
 border-radius: 8px; font-size: 13px; pointer-events: none; z-index: 15;
 }
 
-/* Bottom-Right FF START Button */
 .bottom-right-dock {
 position: absolute; right: 20px; bottom: 20px;
 z-index: 20; display: flex; flex-direction: column; align-items: flex-end; gap: 6px;
@@ -142,24 +148,19 @@ background: rgba(0,0,0,0.65); padding: 4px 10px; border-radius: 6px;
 </head>
 <body>
 
-<!-- Screen 1: Splash -->
-<div id="s1" class="screen">
+<div id="s1" class="screen active-flex">
 <h1>RETRO ROYALE</h1>
 <p>Splash Screen</p>
-<button type="button" class="btn-main btn-blue" onclick="window.goStep(2, 'splash')">ENTER GAME</button>
+<button id="btnEnter" type="button" class="btn-main btn-blue">ENTER GAME</button>
 </div>
 
-<!-- Screen 2: Login -->
-<div id="s2" class="screen hidden">
+<div id="s2" class="screen">
 <h1>LOGIN SCREEN</h1>
 <p>Tap to enter Retro Royale Lobby</p>
-<button type="button" class="btn-main" onclick="window.goStep(3, 'click')">TAP TO START</button>
+<button id="btnTap" type="button" class="btn-main">TAP TO START</button>
 </div>
 
-<!-- Screen 3: Lobby -->
-<div id="s3" class="screen hidden">
-
-<!-- Top HUD -->
+<div id="s3" class="screen">
 <div class="top-hud">
 <div class="hud-pill">
 <div>
@@ -169,28 +170,25 @@ background: rgba(0,0,0,0.65); padding: 4px 10px; border-radius: 6px;
 </div>
 
 <div class="hud-pill">
-<button type="button" class="close-btn" onclick="window.toggleMute()">🔊 Audio</button>
+<button id="btnMute" type="button" class="close-btn">🔊 Audio</button>
 </div>
 </div>
 
-<!-- Left Side Character Button -->
 <div class="left-dock">
-<button type="button" class="ff-side-btn" onclick="window.toggleDrawer()">
+<button id="btnCharDrawer" type="button" class="ff-side-btn">
 <span>👤</span>
 <span>CHARACTER</span>
 </button>
 </div>
 
-<!-- Character Selection Panel (Photos/Cards on Left + 3D Model on Right) -->
-<div id="charDrawer" class="char-drawer hidden">
+<div id="charDrawer" class="char-drawer">
 <div class="drawer-header">
 <span>CHARACTERS</span>
-<button type="button" class="close-btn" onclick="window.toggleDrawer()">✕</button>
+<button id="btnCloseDrawer" type="button" class="close-btn">✕</button>
 </div>
 <div id="charList"></div>
 </div>
 
-<!-- 3D Character Viewer -->
 <div class="stage-3d">
 <div id="modelStatus" class="model-status">3D Character लोड हो रहा है...</div>
 <model-viewer
@@ -206,15 +204,14 @@ shadow-intensity="1">
 </model-viewer>
 </div>
 
-<!-- Bottom-Right Start Button -->
 <div class="bottom-right-dock">
 <div id="startHint" class="start-note">Ready: ADAM</div>
-<button type="button" class="ff-start-btn" onclick="window.onStartClick()">START</button>
+<button id="btnStart" type="button" class="ff-start-btn">START</button>
 </div>
-
 </div>
 
 <script>
+(function () {
 var CHARACTERS = [
 { id: 'adam', name: 'ADAM', skill: 'No Skill', file: './Adam_Lobby.glb', icon: '' },
 { id: 'alok', name: 'ALOK', skill: 'Drop the Beat', file: './alok_lobby.glb', icon: './alok_skill_icon.png' },
@@ -223,58 +220,62 @@ var CHARACTERS = [
 { id: 'eve', name: 'EVE', skill: 'No Skill', file: './eve_lobby.glb', icon: '' }
  ];
 
-var splashAudio = new Audio('./splashClip.mp3');
-var clickAudio = new Audio('./ClickClip.mp3');
-var bgmAudio = new Audio('./lobby_bgm.mp3');
-bgmAudio.loop = true;
 var isMuted = false;
+var selectedIdx = 0;
 
-function playClip(a) {
+function playSound(src, loop) {
 try {
-if (!a || isMuted) return;
+if (isMuted || !src) return;
+var a = new Audio(src);
+a.loop = !!loop;
 a.currentTime = 0;
 var p = a.play();
 if (p && p.catch) p.catch(function () {});
+return a;
 } catch (e) {}
 }
 
-window.toggleMute = function () {
-isMuted = !isMuted;
-if (isMuted) {
-bgmAudio.pause();
-} else if (!document.getElementById('s3').classList.contains('hidden')) {
-playClip(bgmAudio);
+var bgmRef = null;
+
+function showScreen(step) {
+var s1 = document.getElementById('s1');
+var s2 = document.getElementById('s2');
+var s3 = document.getElementById('s3');
+
+s1.className = 'screen';
+s2.className = 'screen';
+s3.className = 'screen';
+
+if (step === 1) s1.className = 'screen active-flex';
+if (step === 2) s2.className = 'screen active-flex';
+if (step === 3) {
+s3.className = 'screen active-block';
+renderCharacterCards();
+selectCharacter(selectedIdx, true);
+if (!isMuted && !bgmRef) {
+bgmRef = playSound('./lobby_bgm.mp3', true);
 }
-};
-
-var mvEl = document.getElementById('mv');
-var statusEl = document.getElementById('modelStatus');
-var selectedIdx = 0;
-
-mvEl.addEventListener('load', function () {
-statusEl.style.display = 'none';
-});
-
-mvEl.addEventListener('error', function () {
-statusEl.style.display = 'block';
-statusEl.innerText = '3D मॉडल लोड नहीं हो पाया: ' + mvEl.getAttribute('src');
-});
+}
+}
 
 function renderCharacterCards() {
 var listEl = document.getElementById('charList');
+if (!listEl) return;
 listEl.innerHTML = '';
 
-CHARACTERS.forEach(function (c, idx) {
+for (var i = 0; i < CHARACTERS.length; i++) {
+(function (idx) {
+var c = CHARACTERS[idx];
 var btn = document.createElement('button');
 btn.type = 'button';
 btn.className = 'char-card' + (idx === selectedIdx ? ' active' : '');
-btn.onclick = function () {
-window.selectCharacter(idx);
-};
+btn.addEventListener('click', function () {
+selectCharacter(idx, false);
+});
 
 var avatarHtml = c.icon
-? '<img src="' + c.icon + '" alt="' + c.name + '" onerror="this.parentNode.innerText='' + c.name[0] + ''" />'
-: c.name[0];
+? '<img src="' + c.icon + '" alt="' + c.name + '" onerror="this.parentNode.innerText='' + c.name.charAt(0) + ''" />'
+: c.name.charAt(0);
 
 btn.innerHTML =
 '<div class="char-avatar">' + avatarHtml + '</div>' +
@@ -284,51 +285,82 @@ btn.innerHTML =
 '</div>';
 
 listEl.appendChild(btn);
-});
+})(i);
+}
 }
 
-window.selectCharacter = function (idx) {
-playClip(clickAudio);
+function selectCharacter(idx, silent) {
 selectedIdx = idx;
 var c = CHARACTERS[selectedIdx];
+if (!c) return;
+
+if (!silent) playSound('./ClickClip.mp3', false);
 
 document.getElementById('hudCharName').innerText = c.name;
 document.getElementById('hudCharSkill').innerText = 'Skill: ' + c.skill;
 document.getElementById('startHint').innerText = 'Ready: ' + c.name;
 
+var mvEl = document.getElementById('mv');
+var statusEl = document.getElementById('modelStatus');
+if (statusEl) {
 statusEl.style.display = 'block';
 statusEl.innerText = c.name + ' लोड हो रहा है...';
+}
+if (mvEl) {
 mvEl.setAttribute('src', c.file);
+}
 
 renderCharacterCards();
-};
+}
 
-window.toggleDrawer = function () {
-playClip(clickAudio);
-document.getElementById('charDrawer').classList.toggle('hidden');
-};
+var mvEl = document.getElementById('mv');
+var statusEl = document.getElementById('modelStatus');
+if (mvEl && statusEl) {
+mvEl.addEventListener('load', function () {
+statusEl.style.display = 'none';
+});
+mvEl.addEventListener('error', function () {
+statusEl.style.display = 'block';
+statusEl.innerText = '3D मॉडल लोड नहीं हो पाया: ' + mvEl.getAttribute('src');
+});
+}
 
-window.onStartClick = function () {
-playClip(clickAudio);
+document.getElementById('btnEnter').addEventListener('click', function () {
+playSound('./splashClip.mp3', false);
+showScreen(2);
+});
+
+document.getElementById('btnTap').addEventListener('click', function () {
+playSound('./ClickClip.mp3', false);
+showScreen(3);
+});
+
+document.getElementById('btnCharDrawer').addEventListener('click', function () {
+playSound('./ClickClip.mp3', false);
+document.getElementById('charDrawer').classList.toggle('open');
+});
+
+document.getElementById('btnCloseDrawer').addEventListener('click', function () {
+playSound('./ClickClip.mp3', false);
+document.getElementById('charDrawer').classList.remove('open');
+});
+
+document.getElementById('btnMute').addEventListener('click', function () {
+isMuted = !isMuted;
+if (isMuted && bgmRef) {
+try { bgmRef.pause(); } catch (e) {}
+bgmRef = null;
+} else if (!isMuted && document.getElementById('s3').className.indexOf('active-block') !== -1) {
+bgmRef = playSound('./lobby_bgm.mp3', true);
+}
+});
+
+document.getElementById('btnStart').addEventListener('click', function () {
+playSound('./ClickClip.mp3', false);
 var c = CHARACTERS[selectedIdx];
 document.getElementById('startHint').innerText = c.name + ' Selected — Next Module Ready';
-};
-
-window.goStep = function (step, soundType) {
-if (soundType === 'splash') playClip(splashAudio);
-if (soundType === 'click') playClip(clickAudio);
-
-document.getElementById('s1').classList.add('hidden');
-document.getElementById('s2').classList.add('hidden');
-document.getElementById('s3').classList.add('hidden');
-document.getElementById('s' + step).classList.remove('hidden');
-
-if (step === 3) {
-renderCharacterCards();
-window.selectCharacter(selectedIdx);
-playClip(bgmAudio);
-}
-};
+});
+})();
 </script>
 </body>
 </html>
