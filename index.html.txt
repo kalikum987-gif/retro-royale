@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Retro Royale - Module 1 Prototype</title>
+<!-- 3D Model Viewer (बिना भारी इंजन के Adam_Lobby.glb दिखाने के लिए) -->
+<script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+body, html { width: 100%; height: 100%; overflow: hidden; background: #0a0a0f; color: #fff; }
+
+.screen {
+position: absolute; inset: 0;
+display: none; flex-direction: column;
+align-items: center; justify-content: center;
+background-size: cover; background-position: center;
+transition: opacity 0.5s ease;
+}
+.screen.active { display: flex; }
+
+/* 1. Splash Screen */
+#splashScreen {
+background-image: linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.65)), url('./splash_bg.png.png');
+}
+.game-title {
+font-size: 3rem; font-weight: 900; letter-spacing: 3px;
+text-transform: uppercase; text-shadow: 0 4px 15px rgba(255, 165, 0, 0.8);
+margin-bottom: 12px;
+}
+.sub-text { font-size: 1rem; opacity: 0.9; margin-bottom: 24px; }
+
+/* 2. Login / Tap to Start Screen */
+#loginScreen {
+background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('./login_bg.png.png');
+justify-content: space-between; padding: 40px 20px;
+}
+.tap-btn {
+padding: 16px 42px; font-size: 1.3rem; font-weight: 800;
+color: #111; background: linear-gradient(90deg, #ffae00, #ff5e00);
+border: none; border-radius: 8px; cursor: pointer;
+box-shadow: 0 0 25px rgba(255, 140, 0, 0.8);
+animation: pulse 1.4s infinite;
+}
+@keyframes pulse {
+0%, 100% { transform: scale(1); }
+50% { transform: scale(1.06); }
+}
+
+/* 3. Lobby Screen */
+#lobbyScreen {
+background: radial-gradient(circle at center, #1e2638 0%, #0b0e14 100%);
+justify-content: space-between; padding: 20px;
+}
+.lobby-top {
+width: 100%; display: flex; justify-content: space-between; align-items: center;
+padding: 10px 20px; background: rgba(255,255,255,0.06); border-radius: 10px;
+}
+.player-badge { font-weight: 700; color: #ffbe3b; }
+
+/* बीच में Adam 3D Model */
+model-viewer {
+width: 100%; height: 62vh;
+--poster-color: transparent;
+}
+
+/* नीचे Lobby UI / Buttons */
+.lobby-bottom {
+width: 100%; max-width: 900px;
+display: flex; flex-direction: column; align-items: center; gap: 12px;
+}
+.ui-strip {
+max-height: 75px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2);
+}
+.btn-row { display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; }
+.action-btn {
+padding: 12px 26px; font-size: 1rem; font-weight: 700;
+border: none; border-radius: 6px; cursor: pointer;
+background: #273043; color: #fff; border: 1px solid #44526e;
+}
+.action-btn.start {
+background: linear-gradient(90deg, #ffae00, #ff5500);
+color: #111; border: none; font-size: 1.15rem; padding: 12px 38px;
+}
+</style>
+</head>
+<body>
+
+<!-- ऑडियो फाइल्स (तेरी रिपॉजिटरी के असली नामों के साथ) -->
+<audio id="splashAudio" src="./splashClip.mp3.mp3" preload="auto"></audio>
+<audio id="clickAudio" src="./clickClip.mp3.mp3" preload="auto"></audio>
+<audio id="lobbyBgm" src="./lobby_bgm.mp3.mp3" preload="auto" loop></audio>
+
+<!-- SCREEN 1: SPLASH SCREEN -->
+<div id="splashScreen" class="screen active">
+<div class="game-title">RETRO ROYALE</div>
+<div class="sub-text">लोड हो रहा है... (या स्क्रीन पर कहीं भी क्लिक करें)</div>
+<button class="action-btn" onclick="startSequence()">ENTER GAME</button>
+</div>
+
+<!-- SCREEN 2: LOGIN / TAP TO START -->
+<div id="loginScreen" class="screen">
+<div class="game-title" style="font-size: 2.2rem;">RETRO ROYALE</div>
+<div style="text-align:center;">
+<p class="sub-text">सर्वर कनेक्टेड • अकाउंट तैयार</p>
+<button class="tap-btn" onclick="goToLobby()">TAP TO START</button>
+</div>
+</div>
+
+<!-- SCREEN 3: MAIN LOBBY (WITH ADAM 3D) -->
+<div id="lobbyScreen" class="screen">
+<div class="lobby-top">
+<div class="player-badge">👤 PRAVEEN (LV. 1) • ADAM</div>
+<div>💰 1000  |  💎 50</div>
+</div>
+
+<!-- तेरा Adam_Lobby.glb मॉडल -->
+<model-viewer
+src="./Adam_Lobby.glb"
+alt="Adam Lobby Character"
+camera-controls
+auto-rotate
+shadow-intensity="1"
+exposure="1.1">
+</model-viewer>
+
+<div class="lobby-bottom">
+<img src="./lobby_buttons.png.png" alt="Lobby UI" class="ui-strip" />
+<div class="btn-row">
+<button class="action-btn" onclick="playClick()">CHARACTER (ADAM)</button>
+<button class="action-btn" onclick="playClick()">VAULT</button>
+<button class="action-btn start" onclick="playClick()">START MATCH</button>
+</div>
+</div>
+</div>
+
+<script>
+const splashAudio = document.getElementById('splashAudio');
+const clickAudio = document.getElementById('clickAudio');
+const lobbyBgm = document.getElementById('lobbyBgm');
+
+function playClick() {
+clickAudio.currentTime = 0;
+clickAudio.play().catch(() => {});
+}
+
+// Step 1: Splash से Login की तरफ बढ़ना
+function startSequence() {
+splashAudio.play().catch(() => {});
+setTimeout(() => {
+document.getElementById('splashScreen').classList.remove('active');
+document.getElementById('loginScreen').classList.add('active');
+}, 1800);
+}
+
+// Step 2: Login (Tap to Start) से Lobby में जाना
+function goToLobby() {
+playClick();
+document.getElementById('loginScreen').classList.remove('active');
+document.getElementById('lobbyScreen').classList.add('active');
+lobbyBgm.volume = 0.5;
+lobbyBgm.play().catch(() => {});
+}
+</script>
+</body>
+</html>
