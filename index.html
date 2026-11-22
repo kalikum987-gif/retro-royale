@@ -4,57 +4,154 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Retro Royale</title>
+<script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
-body, html { width: 100%; height: 100%; background: #11131a; color: #fff; }
+body, html { width: 100%; height: 100%; overflow: hidden; background: #11131a; color: #fff; }
 .box {
+position: fixed; inset: 0;
 width: 100%; height: 100%;
 display: flex; flex-direction: column;
-align-items: center; justify-content: center;
-text-align: center; padding: 20px; gap: 14px;
+align-items: center; justify-content: space-between;
+text-align: center; padding: 18px;
+background-size: cover; background-position: center;
 }
-.hidden { display: none; }
+#s1 {
+justify-content: center; gap: 14px;
+background-image: linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.65)), url('./splash_bg.png.jpg');
+}
+#s2 {
+justify-content: center; gap: 14px;
+background-image: linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.65)), url('./login_bg.png.jpg');
+}
+#s3 {
+background-image: linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.6)), url('./lobby_bg.png.jpg');
+}
+.hidden { display: none !important; }
+.top-bar, .bottom-bar {
+width: 100%; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;
+background: rgba(0,0,0,0.55); padding: 10px 14px; border-radius: 10px; z-index: 10;
+}
+.top-bar { justify-content: space-between; }
+.model-area {
+position: relative; width: 100%; height: 52vh;
+display: flex; align-items: center; justify-content: center; z-index: 5;
+}
+model-viewer { width: 100%; height: 100%; background: transparent; --poster-color: transparent; }
+.model-status {
+position: absolute; top: 8px; left: 50%; transform: translateX(-50%);
+background: rgba(0,0,0,0.72); color: #ffd54f; padding: 6px 12px;
+border-radius: 8px; font-size: 13px; pointer-events: none; z-index: 6;
+}
 button {
-padding: 12px 24px; font-size: 16px; font-weight: bold;
+padding: 11px 20px; font-size: 15px; font-weight: bold;
 border: none; border-radius: 8px; cursor: pointer;
 background: #ffb300; color: #111;
 }
+button.blue { background: #1e88e5; color: #fff; }
 </style>
 </head>
 <body>
 
 <div id="s1" class="box">
 <h1>RETRO ROYALE</h1>
-<p>Step 1: Splash</p>
-<button id="b1" type="button" onclick="window.nextStep(2)">ENTER GAME</button>
+<p>Splash Screen</p>
+<button type="button" class="blue" onclick="window.goStep(2, 'splash')">ENTER GAME</button>
 </div>
 
 <div id="s2" class="box hidden">
 <h1>LOGIN SCREEN</h1>
-<p>Step 2: Login</p>
-<button id="b2" type="button" onclick="window.nextStep(3)">TAP TO START</button>
+<p>Login Screen</p>
+<button type="button" onclick="window.goStep(3, 'click')">TAP TO START</button>
 </div>
 
 <div id="s3" class="box hidden">
-<h1>LOBBY SCREEN</h1>
-<p id="charText">Current Character: ADAM</p>
-<button id="b3" type="button" onclick="window.toggleChar()">SWITCH CHARACTER (ADAM / ALOK)</button>
+<div class="top-bar">
+<div id="charText">Current Character: ADAM</div>
+<div id="skillText">Skill: No Skill</div>
+</div>
+
+<div class="model-area">
+<div id="modelStatus" class="model-status">3D Character लोड हो रहा है...</div>
+<model-viewer
+id="mv"
+src="./Adam_Lobby.glb"
+alt="Character"
+auto-rotate
+camera-controls
+camera-orbit="0deg 75deg auto"
+field-of-view="35deg"
+exposure="1.4"
+shadow-intensity="1">
+</model-viewer>
+</div>
+
+<div class="bottom-bar">
+<button type="button" class="blue" onclick="window.toggleChar()">SWITCH CHARACTER (ADAM / ALOK)</button>
+</div>
 </div>
 
 <script>
-window.nextStep = function (step) {
+var splashAudio = new Audio('./splashClip.mp3');
+var clickAudio = new Audio('./ClickClip.mp3');
+var bgmAudio = new Audio('./lobby_bgm.mp3');
+bgmAudio.loop = true;
+
+function playClip(a) {
+try {
+if (!a) return;
+a.currentTime = 0;
+var p = a.play();
+if (p && p.catch) p.catch(function () {});
+} catch (e) {}
+}
+
+var mvEl = document.getElementById('mv');
+var statusEl = document.getElementById('modelStatus');
+
+mvEl.addEventListener('load', function () {
+statusEl.style.display = 'none';
+});
+
+mvEl.addEventListener('error', function () {
+statusEl.style.display = 'block';
+statusEl.innerText = '3D मॉडल लोड नहीं हो पाया: ' + mvEl.getAttribute('src');
+});
+
+var isAlok = false;
+
+function refreshLobby() {
+document.getElementById('charText').innerText =
+'Current Character: ' + (isAlok ? 'ALOK' : 'ADAM');
+document.getElementById('skillText').innerText =
+isAlok ? 'Skill: Drop the Beat' : 'Skill: No Skill';
+
+var targetModel = isAlok ? './alok_lobby.glb' : './Adam_Lobby.glb';
+statusEl.style.display = 'block';
+statusEl.innerText = (isAlok ? 'Alok' : 'Adam') + ' लोड हो रहा है...';
+mvEl.setAttribute('src', targetModel);
+}
+
+window.goStep = function (step, soundType) {
+if (soundType === 'splash') playClip(splashAudio);
+if (soundType === 'click') playClip(clickAudio);
+
 document.getElementById('s1').classList.add('hidden');
 document.getElementById('s2').classList.add('hidden');
 document.getElementById('s3').classList.add('hidden');
 document.getElementById('s' + step).classList.remove('hidden');
+
+if (step === 3) {
+refreshLobby();
+playClip(bgmAudio);
+}
 };
 
-var isAlok = false;
 window.toggleChar = function () {
+playClip(clickAudio);
 isAlok = !isAlok;
-document.getElementById('charText').innerText =
-'Current Character: ' + (isAlok ? 'ALOK (Drop the Beat)' : 'ADAM (No Skill)');
+refreshLobby();
 };
 </script>
 </body>
-</html>ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+</html>
