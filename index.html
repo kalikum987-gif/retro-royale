@@ -4,342 +4,57 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Retro Royale</title>
-<script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
-<script src="./characters_data.js"></script>
-<script src="./skills_rules.js"></script>
 <style>
-* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
-body, html { width: 100%; height: 100%; overflow: hidden; background: #0a0a0f; color: #fff; }
-.screen {
-position: fixed; inset: 0;
-display: none; flex-direction: column;
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
+body, html { width: 100%; height: 100%; background: #11131a; color: #fff; }
+.box {
+width: 100%; height: 100%;
+display: flex; flex-direction: column;
 align-items: center; justify-content: center;
-background-size: cover; background-position: center;
-text-align: center; padding: 16px;
+text-align: center; padding: 20px; gap: 14px;
 }
-.screen.active { display: flex; }
-#splash-screen {
-background-image: linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.65)), url('./splash_bg.png.jpg');
-}
-#login-screen {
-background-image: linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.65)), url('./login_bg.png.jpg');
-}
-#lobby-screen {
-background-image:
-radial-gradient(circle at center, rgba(255, 196, 110, 0.08) 0%, rgba(10, 8, 6, 0.58) 100%),
-linear-gradient(to top, rgba(12, 9, 6, 0.72) 0%, rgba(255, 178, 85, 0.14) 55%, rgba(10, 10, 14, 0.45) 100%),
-url('./lobby_bg.png.jpg');
-justify-content: space-between;
-}
-.title { font-size: 2.3rem; font-weight: 800; letter-spacing: 2px; text-shadow: 0 4px 15px rgba(0,0,0,0.85); }
-.sub { margin-top: 8px; font-size: 1rem; opacity: 0.92; }
-.btn {
-margin-top: 12px; padding: 11px 22px; font-size: 0.95rem; font-weight: 700;
+.hidden { display: none; }
+button {
+padding: 12px 24px; font-size: 16px; font-weight: bold;
 border: none; border-radius: 8px; cursor: pointer;
-box-shadow: 0 4px 14px rgba(0,0,0,0.5);
-position: relative; z-index: 20;
+background: #ffb300; color: #111;
 }
-.btn:active { transform: scale(0.97); }
-.btn-primary { background: #1e88e5; color: #fff; }
-.btn-gold { background: #ffb300; color: #111; }
-.btn-google { background: #ffffff; color: #202124; }
-.auth-status { margin-top: 12px; font-size: 0.95rem; color: #ffd54f; font-weight: 600; text-shadow: 0 2px 8px rgba(0,0,0,0.85); }
-.top-bar {
-width: 100%; display: flex; justify-content: space-between; align-items: center; gap: 10px;
-padding: 8px 12px; background: rgba(15,12,8,0.75); border-radius: 8px;
-font-size: 0.9rem; z-index: 20;
-}
-.model-wrap {
-position: relative; width: 100%; height: 48vh;
-display: flex; align-items: center; justify-content: center;
-z-index: 5;
-}
-model-viewer { width: 100%; height: 100%; background: transparent; --poster-color: transparent; }
-.model-msg {
-position: absolute; top: 8px; left: 50%; transform: translateX(-50%);
-background: rgba(18, 16, 12, 0.85); border: 1px solid rgba(255, 213, 79, 0.5);
-color: #ffd54f; padding: 6px 12px; border-radius: 8px; font-size: 0.8rem;
-z-index: 6; pointer-events: none;
-}
-.skill-panel {
-display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: center;
-padding: 8px 14px; border-radius: 10px;
-background: rgba(15,12,8,0.78); border: 1px solid rgba(255,213,79,0.35);
-z-index: 20;
-}
-.skill-btn {
-display: inline-flex; align-items: center; gap: 8px;
-padding: 8px 14px; border-radius: 8px; border: none;
-background: #00acc1; color: #fff; font-weight: 700; cursor: pointer;
-}
-.skill-btn:disabled { opacity: 0.55; cursor: not-allowed; }
-.skill-btn img { width: 24px; height: 24px; object-fit: contain; border-radius: 4px; }
-.bottom-bar {
-width: 100%; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;
-padding-bottom: 6px; z-index: 20;
-}
-.char-modal {
-position: fixed; inset: 0; background: rgba(0,0,0,0.8);
-display: none; align-items: center; justify-content: center; z-index: 50; padding: 16px;
-}
-.char-modal.open { display: flex; }
-.char-box {
-width: 100%; max-width: 540px; background: #161822; border: 1px solid #333a4f;
-border-radius: 12px; padding: 18px; text-align: left;
-}
-.char-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(145px, 1fr)); gap: 10px; margin-top: 12px; }
-.char-card {
-background: #222636; border: 1px solid #3c435c; border-radius: 8px;
-padding: 10px; cursor: pointer; text-align: center;
-}
-.char-card.selected { border-color: #ffb300; background: #2c281c; }
 </style>
 </head>
 <body>
 
-<!-- 1. SPLASH SCREEN -->
-<div id="splash-screen" class="screen active">
-<div class="title">RETRO ROYALE</div>
-<div class="sub">लोड हो रहा है... (नीचे बटन दबाएं)</div>
-<button id="goLoginBtn" type="button" class="btn btn-primary">ENTER GAME</button>
+<div id="s1" class="box">
+<h1>RETRO ROYALE</h1>
+<p>Step 1: Splash</p>
+<button id="b1" type="button" onclick="window.nextStep(2)">ENTER GAME</button>
 </div>
 
-<!-- 2. LOGIN SCREEN -->
-<div id="login-screen" class="screen">
-<div class="title">RETRO ROYALE</div>
-<div class="sub">सर्वर कनेक्टेड • अपना अकाउंट चुनें</div>
-<button id="googleBtn" type="button" class="btn btn-google">Continue with Google</button>
-<div id="accStatus" class="auth-status">अकाउंट: Guest / Ready</div>
-<button id="goLobbyBtn" type="button" class="btn btn-gold">TAP TO START</button>
+<div id="s2" class="box hidden">
+<h1>LOGIN SCREEN</h1>
+<p>Step 2: Login</p>
+<button id="b2" type="button" onclick="window.nextStep(3)">TAP TO START</button>
 </div>
 
-<!-- 3. LOBBY SCREEN -->
-<div id="lobby-screen" class="screen">
-<div class="top-bar">
-<div id="player-tag">PRAVEEN (LV. 1) • ADAM</div>
-<div id="skill-info">Skill: No Skill (None)</div>
-</div>
-
-<div class="model-wrap">
-<div id="model-msg" class="model-msg">3D Model लोड हो रहा है...</div>
-<model-viewer
-id="lobby-character"
-src="./Adam_Lobby.glb"
-alt="Lobby 3D Character"
-auto-rotate
-camera-controls
-shadow-intensity="1"
-camera-orbit="0deg 75deg auto"
-field-of-view="35deg"
-exposure="1.4"
-interaction-prompt="none">
-</model-viewer>
-</div>
-
-<div class="skill-panel">
-<button id="active-skill-btn" type="button" class="skill-btn" style="display:none;">
-<img src="./alok_skill_icon.png" alt="Alok" onerror="this.style.display='none'" />
-<span>DROP THE BEAT</span>
-</button>
-<div id="skill-status-text">No Skill</div>
-</div>
-
-<div class="bottom-bar">
-<button id="char-btn" type="button" class="btn btn-primary" style="margin:0;">CHARACTER (ADAM)</button>
-<button id="vault-btn" type="button" class="btn btn-primary" style="margin:0;">VAULT</button>
-<button id="match-btn" type="button" class="btn btn-gold" style="margin:0;">START MATCH</button>
-</div>
-</div>
-
-<!-- CHARACTER SELECTOR MODAL -->
-<div id="char-modal" class="char-modal">
-<div class="char-box">
-<div style="display:flex; justify-content:space-between; align-items:center;">
-<h3>Select Character</h3>
-<button id="close-modal-btn" type="button" class="btn" style="margin:0; padding:6px 12px; background:#444; color:#fff;">Close</button>
-</div>
-<div id="char-list" class="char-list"></div>
-</div>
+<div id="s3" class="box hidden">
+<h1>LOBBY SCREEN</h1>
+<p id="charText">Current Character: ADAM</p>
+<button id="b3" type="button" onclick="window.toggleChar()">SWITCH CHARACTER (ADAM / ALOK)</button>
 </div>
 
 <script>
-(function () {
-const splash = document.getElementById('splash-screen');
-const login = document.getElementById('login-screen');
-const lobby = document.getElementById('lobby-screen');
+window.nextStep = function (step) {
+document.getElementById('s1').classList.add('hidden');
+document.getElementById('s2').classList.add('hidden');
+document.getElementById('s3').classList.add('hidden');
+document.getElementById('s' + step).classList.remove('hidden');
+};
 
-function showScreen(target) {
-splash.classList.remove('active');
-login.classList.remove('active');
-lobby.classList.remove('active');
-target.classList.add('active');
-}
-
-function makeAudio(list, loop) {
-const a = new Audio();
-a.preload = 'auto';
-a.loop = !!loop;
-let i = 0;
-a.addEventListener('error', () => {
-i++;
-if (i < list.length) {
-a.src = list[i];
-a.load();
-}
-});
-a.src = list[0];
-return a;
-}
-
-const splashClip = makeAudio(['./splashClip.mp3', './splashClip.mp3.mp3'], false);
-const clickClip = makeAudio(['./ClickClip.mp3', './ClickClip.mp3.mp3'], false);
-const lobbyBgm = makeAudio(['./lobby_bgm.mp3', './lobby_bgm.mp3.mp3'], true);
-
-function playSound(a) {
-try {
-if (!a) return;
-a.currentTime = 0;
-const p = a.play();
-if (p && p.catch) p.catch(() => {});
-} catch (_) {}
-}
-
-const DEFAULT_CHARS = [
-{ id: "adam", name: "Adam", skillType: "none", skillName: "No Skill", model: "./Adam_Lobby.glb" },
-{ id: "eve", name: "Eve", skillType: "none", skillName: "No Skill", model: "./eve_lobby.glb" },
-{ id: "alok", name: "Alok", skillType: "active", skillName: "Drop the Beat", model: "./alok_lobby.glb" },
-{ id: "andrew", name: "Andrew", skillType: "passive", skillName: "Armor Specialist", model: "./andrew_lobby.glb" },
-{ id: "maxim", name: "Maxim", skillType: "passive", skillName: "Gluttony", model: "./maxim_lobby.glb" }
- ];
-
-const CHAR_LIST = (typeof CHARACTERS_DATA !== "undefined" && Array.isArray(CHARACTERS_DATA) && CHARACTERS_DATA.length)
-? CHARACTERS_DATA
-: DEFAULT_CHARS;
-
-let selectedAccount = "PRAVEEN (LV. 1)";
-let currentCharId = "adam";
-let skillState = "ready"; // ready | active | cooldown
-let skillTimer = 0;
-
-const mv = document.getElementById('lobby-character');
-const modelMsg = document.getElementById('model-msg');
-
-mv.addEventListener('load', () => {
-modelMsg.style.display = 'none';
-});
-mv.addEventListener('error', () => {
-const c = getChar();
-modelMsg.innerText = Model लोड नहीं हुआ: ${c.model}`;
-modelMsg.style.display = 'block';
-});
-
-function getChar() {
-return CHAR_LIST.find(c => c.id === currentCharId) || CHAR_LIST[0];
-}
-
-function updateSkillUI() {
-const c = getChar();
-const btn = document.getElementById('active-skill-btn');
-const txt = document.getElementById('skill-status-text');
-
-if (c.skillType !== "active") {
-btn.style.display = "none";
-txt.innerText = c.skillType === "passive" ? Passive Active:${c.skillName}` : "No Skill";
-return;
-}
-
-btn.style.display = "inline-flex";
-if (skillState === "ready") {
-btn.disabled = false;
-txt.innerText = "Alok Skill Ready";
-} else if (skillState === "active") {
-btn.disabled = true;
-txt.innerText = Skill Active (${skillTimer}s); } else { btn.disabled = true; txt.innerText =Cooldown (${skillTimer}s);
-}
-}
-
-function updateLobby() {
-const c = getChar();
-document.getElementById('player-tag').innerText = ${selectedAccount} • ${c.name.toUpperCase()};
-document.getElementById('char-btn').innerText = CHARACTER (${c.name.toUpperCase()}); document.getElementById('skill-info').innerText =Skill: ${c.skillName} (${c.skillType})`;
-
-modelMsg.innerText = ``${c.name} लोड हो रहा है...`;
-modelMsg.style.display = 'block';
-mv.setAttribute('src', c.model);
-updateSkillUI();
-}
-
-document.getElementById('goLoginBtn').addEventListener('click', () => {
-playSound(splashClip);
-showScreen(login);
-});
-
-document.getElementById('googleBtn').addEventListener('click', () => {
-playSound(clickClip);
-selectedAccount = "PRAVEEN (GOOGLE • LV. 1)";
-document.getElementById('accStatus').innerText = "अकाउंट कनेक्टेड: " + selectedAccount;
-});
-
-document.getElementById('goLobbyBtn').addEventListener('click', () => {
-playSound(clickClip);
-showScreen(lobby);
-updateLobby();
-playSound(lobbyBgm);
-});
-
-document.getElementById('char-btn').addEventListener('click', () => {
-playSound(clickClip);
-const listEl = document.getElementById('char-list');
-listEl.innerHTML = "";
-CHAR_LIST.forEach(c => {
-const card = document.createElement('div');
-card.className = "char-card" + (c.id === currentCharId ? " selected" : "");
-card.innerHTML = <strong&gt;${c.name}</strong><div style="font-size:0.8rem; opacity:0.85; margin-top:4px;">${c.skillName} (${c.skillType})&lt;/div>;
-card.addEventListener('click', () => {
-playSound(clickClip);
-currentCharId = c.id;
-updateLobby();
-document.getElementById('char-modal').classList.remove('open');
-});
-listEl.appendChild(card);
-});
-document.getElementById('char-modal').classList.add('open');
-});
-
-document.getElementById('close-modal-btn').addEventListener('click', () => {
-playSound(clickClip);
-document.getElementById('char-modal').classList.remove('open');
-});
-
-document.getElementById('vault-btn').addEventListener('click', () => playSound(clickClip));
-document.getElementById('match-btn').addEventListener('click', () => playSound(clickClip));
-
-document.getElementById('active-skill-btn').addEventListener('click', () => {
-playSound(clickClip);
-if (currentCharId !== "alok" || skillState !== "ready") return;
-skillState = "active";
-skillTimer = 10;
-updateSkillUI();
-});
-
-setInterval(() => {
-if (skillState === "active") {
-skillTimer--;
-if (skillTimer <= 0) {
-skillState = "cooldown";
-skillTimer = 25;
-}
-if (currentCharId === "alok") updateSkillUI();
-} else if (skillState === "cooldown") {
-skillTimer--;
-if (skillTimer <= 0) {
-skillState = "ready";
-skillTimer = 0;
-}
-if (currentCharId === "alok") updateSkillUI();
-}
-}, 1000);
-})();
+var isAlok = false;
+window.toggleChar = function () {
+isAlok = !isAlok;
+document.getElementById('charText').innerText =
+'Current Character: ' + (isAlok ? 'ALOK (Drop the Beat)' : 'ADAM (No Skill)');
+};
 </script>
 </body>
-</html> 
+</html>ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
