@@ -6,108 +6,250 @@
 <title>Retro Royale</title>
 <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
 <style>
-* { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
-body, html { width: 100%; height: 100%; overflow: hidden; background: #11131a; color: #fff; }
-.box {
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; user-select: none; }
+body, html { width: 100%; height: 100%; overflow: hidden; background: #0d1017; color: #fff; }
+
+.screen {
 position: fixed; inset: 0;
 width: 100%; height: 100%;
-display: flex; flex-direction: column;
-align-items: center; justify-content: space-between;
-text-align: center; padding: 18px;
 background-size: cover; background-position: center;
 }
+.hidden { display: none !important; }
+
 #s1 {
-justify-content: center; gap: 14px;
-background-image: linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.65)), url('./splash_bg.png.jpg');
+display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
+background-image: linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.68)), url('./splash_bg.png.jpg');
 }
 #s2 {
-justify-content: center; gap: 14px;
-background-image: linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.65)), url('./login_bg.png.jpg');
+display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
+background-image: linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.68)), url('./login_bg.png.jpg');
 }
 #s3 {
-background-image: linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.6)), url('./lobby_bg.png.jpg');
+background-image: linear-gradient(rgba(0,0,0,0.22), rgba(0,0,0,0.48)), url('./lobby_bg.png.jpg');
 }
-.hidden { display: none !important; }
-.top-bar, .bottom-bar {
-width: 100%; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;
-background: rgba(0,0,0,0.55); padding: 10px 14px; border-radius: 10px; z-index: 10;
-}
-.top-bar { justify-content: space-between; }
-.model-area {
-position: relative; width: 100%; height: 52vh;
-display: flex; align-items: center; justify-content: center; z-index: 5;
-}
-model-viewer { width: 100%; height: 100%; background: transparent; --poster-color: transparent; }
-.model-status {
-position: absolute; top: 8px; left: 50%; transform: translateX(-50%);
-background: rgba(0,0,0,0.72); color: #ffd54f; padding: 6px 12px;
-border-radius: 8px; font-size: 13px; pointer-events: none; z-index: 6;
-}
-button {
-padding: 11px 20px; font-size: 15px; font-weight: bold;
+
+.btn-main {
+padding: 12px 24px; font-size: 16px; font-weight: bold;
 border: none; border-radius: 8px; cursor: pointer;
 background: #ffb300; color: #111;
 }
-button.blue { background: #1e88e5; color: #fff; }
+.btn-blue { background: #1e88e5; color: #fff; }
+
+/* Top Bar - FF Style Corners */
+.top-hud {
+position: absolute; top: 14px; left: 14px; right: 14px;
+display: flex; justify-content: space-between; align-items: center;
+z-index: 20; pointer-events: none;
+}
+.hud-pill {
+pointer-events: auto;
+background: rgba(12, 16, 26, 0.78);
+border: 1px solid rgba(255, 255, 255, 0.16);
+padding: 8px 14px; border-radius: 8px;
+display: flex; align-items: center; gap: 10px;
+}
+.char-badge-title { font-weight: bold; color: #ffd54f; font-size: 15px; }
+.char-badge-skill { font-size: 12px; color: #cfd8dc; }
+
+/* Left Side FF Character Button */
+.left-dock {
+position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
+display: flex; flex-direction: column; gap: 10px; z-index: 20;
+}
+.ff-side-btn {
+width: 96px; padding: 10px 8px;
+background: rgba(15, 20, 32, 0.85);
+border: 1.5px solid #ffb300;
+border-radius: 10px; color: #fff; cursor: pointer;
+display: flex; flex-direction: column; align-items: center; gap: 4px;
+font-weight: bold; font-size: 12px;
+}
+.ff-side-btn:hover { background: rgba(255, 179, 0, 0.2); }
+
+/* Character Drawer / Side Panel */
+.char-drawer {
+position: absolute; left: 124px; top: 76px; bottom: 96px;
+width: 250px; max-width: calc(100vw - 140px);
+background: rgba(12, 16, 26, 0.9);
+border: 1px solid rgba(255, 179, 0, 0.45);
+border-radius: 12px; padding: 12px;
+display: flex; flex-direction: column; gap: 10px;
+z-index: 25; overflow-y: auto;
+}
+.drawer-header {
+display: flex; justify-content: space-between; align-items: center;
+border-bottom: 1px solid rgba(255,255,255,0.12); padding-bottom: 8px;
+font-weight: bold; color: #ffd54f; font-size: 14px;
+}
+.close-btn {
+background: rgba(255,255,255,0.12); color: #fff; border: none;
+border-radius: 6px; padding: 4px 8px; cursor: pointer; font-size: 12px;
+}
+.char-card {
+display: flex; align-items: center; gap: 10px;
+padding: 8px; border-radius: 8px; cursor: pointer;
+background: rgba(255,255,255,0.06);
+border: 1px solid transparent; text-align: left; width: 100%; color: #fff;
+}
+.char-card.active {
+background: rgba(255, 179, 0, 0.2);
+border-color: #ffb300;
+}
+.char-avatar {
+width: 44px; height: 44px; border-radius: 8px;
+background: linear-gradient(135deg, #263238, #455a64);
+display: flex; align-items: center; justify-content: center;
+font-weight: bold; font-size: 15px; color: #ffd54f; flex-shrink: 0;
+overflow: hidden;
+}
+.char-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.char-meta { display: flex; flex-direction: column; gap: 2px; }
+.char-name { font-weight: bold; font-size: 14px; }
+.char-skill-sub { font-size: 11px; color: #b0bec5; }
+
+/* Center-Right 3D Stage */
+.stage-3d {
+position: absolute; inset: 0;
+width: 100%; height: 100%;
+z-index: 5;
+}
+model-viewer {
+width: 100%; height: 100%;
+background: transparent; --poster-color: transparent;
+}
+.model-status {
+position: absolute; top: 72px; left: 50%; transform: translateX(-50%);
+background: rgba(0,0,0,0.72); color: #ffd54f; padding: 6px 12px;
+border-radius: 8px; font-size: 13px; pointer-events: none; z-index: 15;
+}
+
+/* Bottom-Right FF START Button */
+.bottom-right-dock {
+position: absolute; right: 20px; bottom: 20px;
+z-index: 20; display: flex; flex-direction: column; align-items: flex-end; gap: 6px;
+}
+.ff-start-btn {
+padding: 14px 36px; font-size: 20px; font-weight: 900; letter-spacing: 1px;
+border: none; border-radius: 8px; cursor: pointer;
+background: linear-gradient(90deg, #ff9800, #ffc107);
+color: #111; box-shadow: 0 6px 18px rgba(255, 152, 0, 0.35);
+}
+.start-note {
+font-size: 12px; color: #eceff1;
+background: rgba(0,0,0,0.65); padding: 4px 10px; border-radius: 6px;
+}
 </style>
 </head>
 <body>
 
-<div id="s1" class="box">
+<!-- Screen 1: Splash -->
+<div id="s1" class="screen">
 <h1>RETRO ROYALE</h1>
 <p>Splash Screen</p>
-<button type="button" class="blue" onclick="window.goStep(2, 'splash')">ENTER GAME</button>
+<button type="button" class="btn-main btn-blue" onclick="window.goStep(2, 'splash')">ENTER GAME</button>
 </div>
 
-<div id="s2" class="box hidden">
+<!-- Screen 2: Login -->
+<div id="s2" class="screen hidden">
 <h1>LOGIN SCREEN</h1>
-<p>Login Screen</p>
-<button type="button" onclick="window.goStep(3, 'click')">TAP TO START</button>
+<p>Tap to enter Retro Royale Lobby</p>
+<button type="button" class="btn-main" onclick="window.goStep(3, 'click')">TAP TO START</button>
 </div>
 
-<div id="s3" class="box hidden">
-<div class="top-bar">
-<div id="charText">Current Character: ADAM</div>
-<div id="skillText">Skill: No Skill</div>
+<!-- Screen 3: Lobby -->
+<div id="s3" class="screen hidden">
+
+<!-- Top HUD -->
+<div class="top-hud">
+<div class="hud-pill">
+<div>
+<div id="hudCharName" class="char-badge-title">ADAM</div>
+<div id="hudCharSkill" class="char-badge-skill">Skill: No Skill</div>
+</div>
 </div>
 
-<div class="model-area">
+<div class="hud-pill">
+<button type="button" class="close-btn" onclick="window.toggleMute()">🔊 Audio</button>
+</div>
+</div>
+
+<!-- Left Side Character Button -->
+<div class="left-dock">
+<button type="button" class="ff-side-btn" onclick="window.toggleDrawer()">
+<span>👤</span>
+<span>CHARACTER</span>
+</button>
+</div>
+
+<!-- Character Selection Panel (Photos/Cards on Left + 3D Model on Right) -->
+<div id="charDrawer" class="char-drawer hidden">
+<div class="drawer-header">
+<span>CHARACTERS</span>
+<button type="button" class="close-btn" onclick="window.toggleDrawer()">✕</button>
+</div>
+<div id="charList"></div>
+</div>
+
+<!-- 3D Character Viewer -->
+<div class="stage-3d">
 <div id="modelStatus" class="model-status">3D Character लोड हो रहा है...</div>
 <model-viewer
 id="mv"
 src="./Adam_Lobby.glb"
-alt="Character"
+alt="Lobby Character"
 auto-rotate
 camera-controls
-camera-orbit="0deg 75deg auto"
-field-of-view="35deg"
+camera-orbit="0deg 78deg auto"
+field-of-view="34deg"
 exposure="1.4"
 shadow-intensity="1">
 </model-viewer>
 </div>
 
-<div class="bottom-bar">
-<button type="button" class="blue" onclick="window.toggleChar()">SWITCH CHARACTER (ADAM / ALOK)</button>
+<!-- Bottom-Right Start Button -->
+<div class="bottom-right-dock">
+<div id="startHint" class="start-note">Ready: ADAM</div>
+<button type="button" class="ff-start-btn" onclick="window.onStartClick()">START</button>
 </div>
+
 </div>
 
 <script>
+var CHARACTERS = [
+{ id: 'adam', name: 'ADAM', skill: 'No Skill', file: './Adam_Lobby.glb', icon: '' },
+{ id: 'alok', name: 'ALOK', skill: 'Drop the Beat', file: './alok_lobby.glb', icon: './alok_skill_icon.png' },
+{ id: 'andrew', name: 'ANDREW', skill: 'Vest Mastery', file: './andrew_lobby.glb', icon: '' },
+{ id: 'maxim', name: 'MAXIM', skill: 'Gluttony', file: './maxim_lobby.glb', icon: '' },
+{ id: 'eve', name: 'EVE', skill: 'No Skill', file: './eve_lobby.glb', icon: '' }
+ ];
+
 var splashAudio = new Audio('./splashClip.mp3');
 var clickAudio = new Audio('./ClickClip.mp3');
 var bgmAudio = new Audio('./lobby_bgm.mp3');
 bgmAudio.loop = true;
+var isMuted = false;
 
 function playClip(a) {
 try {
-if (!a) return;
+if (!a || isMuted) return;
 a.currentTime = 0;
 var p = a.play();
 if (p && p.catch) p.catch(function () {});
 } catch (e) {}
 }
 
+window.toggleMute = function () {
+isMuted = !isMuted;
+if (isMuted) {
+bgmAudio.pause();
+} else if (!document.getElementById('s3').classList.contains('hidden')) {
+playClip(bgmAudio);
+}
+};
+
 var mvEl = document.getElementById('mv');
 var statusEl = document.getElementById('modelStatus');
+var selectedIdx = 0;
 
 mvEl.addEventListener('load', function () {
 statusEl.style.display = 'none';
@@ -118,19 +260,59 @@ statusEl.style.display = 'block';
 statusEl.innerText = '3D मॉडल लोड नहीं हो पाया: ' + mvEl.getAttribute('src');
 });
 
-var isAlok = false;
+function renderCharacterCards() {
+var listEl = document.getElementById('charList');
+listEl.innerHTML = '';
 
-function refreshLobby() {
-document.getElementById('charText').innerText =
-'Current Character: ' + (isAlok ? 'ALOK' : 'ADAM');
-document.getElementById('skillText').innerText =
-isAlok ? 'Skill: Drop the Beat' : 'Skill: No Skill';
+CHARACTERS.forEach(function (c, idx) {
+var btn = document.createElement('button');
+btn.type = 'button';
+btn.className = 'char-card' + (idx === selectedIdx ? ' active' : '');
+btn.onclick = function () {
+window.selectCharacter(idx);
+};
 
-var targetModel = isAlok ? './alok_lobby.glb' : './Adam_Lobby.glb';
-statusEl.style.display = 'block';
-statusEl.innerText = (isAlok ? 'Alok' : 'Adam') + ' लोड हो रहा है...';
-mvEl.setAttribute('src', targetModel);
+var avatarHtml = c.icon
+? '<img src="' + c.icon + '" alt="' + c.name + '" onerror="this.parentNode.innerText='' + c.name[0] + ''" />'
+: c.name[0];
+
+btn.innerHTML =
+'<div class="char-avatar">' + avatarHtml + '</div>' +
+'<div class="char-meta">' +
+'<div class="char-name">' + c.name + '</div>' +
+'<div class="char-skill-sub">' + c.skill + '</div>' +
+'</div>';
+
+listEl.appendChild(btn);
+});
 }
+
+window.selectCharacter = function (idx) {
+playClip(clickAudio);
+selectedIdx = idx;
+var c = CHARACTERS[selectedIdx];
+
+document.getElementById('hudCharName').innerText = c.name;
+document.getElementById('hudCharSkill').innerText = 'Skill: ' + c.skill;
+document.getElementById('startHint').innerText = 'Ready: ' + c.name;
+
+statusEl.style.display = 'block';
+statusEl.innerText = c.name + ' लोड हो रहा है...';
+mvEl.setAttribute('src', c.file);
+
+renderCharacterCards();
+};
+
+window.toggleDrawer = function () {
+playClip(clickAudio);
+document.getElementById('charDrawer').classList.toggle('hidden');
+};
+
+window.onStartClick = function () {
+playClip(clickAudio);
+var c = CHARACTERS[selectedIdx];
+document.getElementById('startHint').innerText = c.name + ' Selected — Next Module Ready';
+};
 
 window.goStep = function (step, soundType) {
 if (soundType === 'splash') playClip(splashAudio);
@@ -142,15 +324,10 @@ document.getElementById('s3').classList.add('hidden');
 document.getElementById('s' + step).classList.remove('hidden');
 
 if (step === 3) {
-refreshLobby();
+renderCharacterCards();
+window.selectCharacter(selectedIdx);
 playClip(bgmAudio);
 }
-};
-
-window.toggleChar = function () {
-playClip(clickAudio);
-isAlok = !isAlok;
-refreshLobby();
 };
 </script>
 </body>
