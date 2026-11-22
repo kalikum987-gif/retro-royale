@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="hi">
 <head>
@@ -25,7 +23,13 @@ background-image: linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.65)), url('./sp
 background-image: linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.65)), url('./login_bg.png.jpg');
 }
 #lobby-screen {
-background: radial-gradient(circle at center, #1a2a4a 0%, #070b14 100%);
+background-image:
+radial-gradient(circle at center, rgba(255, 196, 110, 0.08) 0%, rgba(10, 8, 6, 0.58) 100%),
+linear-gradient(to top, rgba(12, 9, 6, 0.72) 0%, rgba(255, 178, 85, 0.14) 55%, rgba(10, 10, 14, 0.45) 100%),
+url('./lobby_bg.png.jpg');
+background-size: cover;
+background-position: center;
+filter: sepia(0.18) contrast(1.08) saturate(1.12);
 justify-content: space-between;
 }
 .title { font-size: 2.5rem; font-weight: 800; letter-spacing: 2px; text-shadow: 0 4px 15px rgba(0,0,0,0.8); }
@@ -33,17 +37,22 @@ justify-content: space-between;
 .btn {
 margin-top: 16px; padding: 12px 28px; font-size: 1rem; font-weight: 700;
 border: none; border-radius: 8px; cursor: pointer;
+box-shadow: 0 4px 14px rgba(0,0,0,0.45);
 }
 .btn-primary { background: #1e88e5; color: #fff; }
 .btn-gold { background: #ffb300; color: #111; }
 .btn-google { background: #ffffff; color: #202124; }
-.auth-status { margin-top: 12px; font-size: 0.95rem; color: #ffd54f; font-weight: 600; }
+.auth-status { margin-top: 12px; font-size: 0.95rem; color: #ffd54f; font-weight: 600; text-shadow: 0 2px 8px rgba(0,0,0,0.85); }
 model-viewer { width: 100%; height: 62vh; background: transparent; }
-.top-bar { width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: rgba(0,0,0,0.45); border-radius: 8px; }
+.top-bar {
+width: 100%; display: flex; justify-content: space-between; align-items: center;
+padding: 8px 12px; background: rgba(15,12,8,0.62); border-radius: 8px;
+backdrop-filter: blur(4px);
+}
 .bottom-bar { width: 100%; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; padding-bottom: 10px; }
 .lobby-img-badge {
 display: inline-flex; align-items: center; gap: 8px;
-padding: 6px 12px; border-radius: 8px; background: rgba(0,0,0,0.55); margin-bottom: 6px;
+padding: 6px 12px; border-radius: 8px; background: rgba(15,12,8,0.68); margin-bottom: 6px;
 }
 .lobby-img-badge img { height: 28px; width: auto; object-fit: contain; }
 </style>
@@ -79,7 +88,10 @@ src="./Adam_Lobby.glb"
 alt="Adam Lobby 3D Character"
 auto-rotate
 camera-controls
-shadow-intensity="1">
+shadow-intensity="1"
+camera-orbit="0deg 75deg 3.5m"
+exposure="1.45"
+interaction-prompt="none">
 </model-viewer>
 
 <div class="bottom-bar">
