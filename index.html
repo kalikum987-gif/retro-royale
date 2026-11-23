@@ -4,226 +4,175 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Retro Royale</title>
+<script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
 html, body { width: 100%; height: 100%; overflow: hidden; background: #0d1017; color: #fff; }
 
 .screen {
-position: fixed;
-top: 0; left: 0; right: 0; bottom: 0;
-width: 100%; height: 100%;
-background-size: cover;
-background-position: center;
-z-index: 10;
+position: fixed; inset: 0; width: 100%; height: 100%;
+background-size: cover; background-position: center;
 }
-
 #s1 {
-display: flex;
-flex-direction: column;
-align-items: center;
-justify-content: center;
-gap: 14px;
+display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
 background-image: linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.68)), url('./splash_bg.png.jpg');
 }
-
 #s2 {
-display: none;
-flex-direction: column;
-align-items: center;
-justify-content: center;
-gap: 14px;
+display: none; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
 background-image: linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.68)), url('./login_bg.png.jpg');
 }
-
 #s3 {
 display: none;
-background-image: linear-gradient(rgba(0,0,0,0.22), rgba(0,0,0,0.48)), url('./lobby_bg.png.jpg');
+background-image: linear-gradient(rgba(0,0,0,0.22), rgba(0,0,0,0.45)), url('./lobby_bg.png.jpg');
 }
 
-.btn-main {
-padding: 14px 28px;
-font-size: 16px;
-font-weight: bold;
-border: none;
-border-radius: 8px;
-cursor: pointer;
-background: #ffb300;
-color: #111;
-position: relative;
-z-index: 50;
+.btn {
+padding: 12px 24px; font-size: 16px; font-weight: bold;
+border: none; border-radius: 8px; cursor: pointer;
 }
 .btn-blue { background: #1e88e5; color: #fff; }
+.btn-gold { background: #ffb300; color: #111; }
 
-/* Lobby HUD */
-.top-hud {
+/* Top Corners */
+.hud-top {
 position: absolute; top: 14px; left: 14px; right: 14px;
-display: flex; justify-content: space-between; align-items: center;
-z-index: 30;
+display: flex; justify-content: space-between; align-items: center; z-index: 20;
 }
-.hud-pill {
+.box-dark {
 background: rgba(12, 16, 26, 0.82);
-border: 1px solid rgba(255, 255, 255, 0.18);
-padding: 8px 14px; border-radius: 8px;
-display: flex; align-items: center; gap: 10px;
+border: 1px solid rgba(255, 255, 255, 0.16);
+border-radius: 8px; padding: 8px 14px;
 }
-.char-badge-title { font-weight: bold; color: #ffd54f; font-size: 15px; }
-.char-badge-skill { font-size: 12px; color: #cfd8dc; }
+.title-gold { font-weight: bold; color: #ffd54f; font-size: 15px; }
+.sub-text { font-size: 12px; color: #cfd8dc; }
 
-.left-dock {
+/* Left Side CHARACTER Button */
+.left-btn {
 position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
-display: flex; flex-direction: column; gap: 10px; z-index: 30;
-}
-.ff-side-btn {
-width: 96px; padding: 10px 8px;
-background: rgba(15, 20, 32, 0.88);
-border: 1.5px solid #ffb300;
-border-radius: 10px; color: #fff; cursor: pointer;
-display: flex; flex-direction: column; align-items: center; gap: 4px;
-font-weight: bold; font-size: 12px;
+z-index: 20; width: 100px; padding: 10px 8px;
+background: rgba(15, 20, 32, 0.88); border: 1.5px solid #ffb300;
+border-radius: 10px; color: #fff; font-weight: bold; font-size: 12px; cursor: pointer;
 }
 
-.char-drawer {
-position: absolute; left: 124px; top: 76px; bottom: 96px;
-width: 250px; max-width: calc(100vw - 140px);
-background: rgba(12, 16, 26, 0.94);
-border: 1px solid rgba(255, 179, 0, 0.5);
-border-radius: 12px; padding: 12px;
-display: none; flex-direction: column; gap: 10px;
-z-index: 35; overflow-y: auto;
+/* Character Side Panel */
+.panel {
+position: absolute; left: 126px; top: 76px; bottom: 96px;
+width: 245px; max-width: calc(100vw - 142px);
+background: rgba(12, 16, 26, 0.94); border: 1px solid rgba(255, 179, 0, 0.5);
+border-radius: 12px; padding: 12px; display: none; flex-direction: column; gap: 8px;
+z-index: 25; overflow-y: auto;
 }
-.drawer-header {
+.panel-head {
 display: flex; justify-content: space-between; align-items: center;
-border-bottom: 1px solid rgba(255,255,255,0.12); padding-bottom: 8px;
-font-weight: bold; color: #ffd54f; font-size: 14px;
+padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.12);
+color: #ffd54f; font-weight: bold; font-size: 14px;
 }
-.close-btn {
+.small-btn {
 background: rgba(255,255,255,0.15); color: #fff; border: none;
-border-radius: 6px; padding: 5px 10px; cursor: pointer; font-size: 12px;
+border-radius: 6px; padding: 5px 9px; cursor: pointer; font-size: 12px;
 }
-.char-card {
-display: flex; align-items: center; gap: 10px;
-padding: 8px; border-radius: 8px; cursor: pointer;
-background: rgba(255,255,255,0.07);
-border: 1px solid transparent; text-align: left; width: 100%; color: #fff;
+.char-item {
+width: 100%; padding: 8px 10px; border-radius: 8px; cursor: pointer;
+background: rgba(255,255,255,0.07); border: 1px solid transparent;
+color: #fff; text-align: left; display: flex; flex-direction: column; gap: 2px;
 }
-.char-card.active {
-background: rgba(255, 179, 0, 0.22);
-border-color: #ffb300;
-}
-.char-avatar {
-width: 44px; height: 44px; border-radius: 8px;
-background: #263238;
-display: flex; align-items: center; justify-content: center;
-font-weight: bold; font-size: 15px; color: #ffd54f; flex-shrink: 0;
-overflow: hidden;
-}
-.char-avatar img { width: 100%; height: 100%; object-fit: cover; }
-.char-meta { display: flex; flex-direction: column; gap: 2px; }
-.char-name { font-weight: bold; font-size: 14px; }
-.char-skill-sub { font-size: 11px; color: #b0bec5; }
+.char-item.active { background: rgba(255, 179, 0, 0.22); border-color: #ffb300; }
 
-.stage-3d {
-position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-width: 100%; height: 100%;
-z-index: 15;
-}
-model-viewer {
-width: 100%; height: 100%;
-background: transparent; --poster-color: transparent;
-}
-.model-status {
+/* 3D Stage */
+.stage { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 10; }
+model-viewer { width: 100%; height: 100%; background: transparent; --poster-color: transparent; }
+.status {
 position: absolute; top: 72px; left: 50%; transform: translateX(-50%);
-background: rgba(0,0,0,0.75); color: #ffd54f; padding: 6px 12px;
-border-radius: 8px; font-size: 13px; pointer-events: none; z-index: 25;
+background: rgba(0,0,0,0.78); color: #ffd54f; padding: 6px 12px;
+border-radius: 8px; font-size: 13px; z-index: 15; text-align: center;
 }
 
-.bottom-right-dock {
-position: absolute; right: 20px; bottom: 20px;
-z-index: 30; display: flex; flex-direction: column; align-items: flex-end; gap: 6px;
+/* Bottom-Right START Button */
+.right-bottom {
+position: absolute; right: 20px; bottom: 20px; z-index: 20;
+display: flex; flex-direction: column; align-items: flex-end; gap: 6px;
 }
-.ff-start-btn {
-padding: 14px 36px; font-size: 20px; font-weight: 900; letter-spacing: 1px;
+.start-btn {
+padding: 14px 34px; font-size: 20px; font-weight: 900;
 border: none; border-radius: 8px; cursor: pointer;
-background: linear-gradient(90deg, #ff9800, #ffc107);
-color: #111;
-}
-.start-note {
-font-size: 12px; color: #eceff1;
-background: rgba(0,0,0,0.68); padding: 4px 10px; border-radius: 6px;
+background: linear-gradient(90deg, #ff9800, #ffc107); color: #111;
 }
 </style>
 </head>
 <body>
 
-<!-- Screen 1 -->
+<!-- 1. Splash -->
 <div id="s1" class="screen">
 <h1>RETRO ROYALE</h1>
-<p>Splash Screen (v2)</p>
-<button type="button" class="btn-main btn-blue" onclick="goStep(2)">ENTER GAME</button>
+<button type="button" class="btn btn-blue" onclick="goStep(2, './splashClip.mp3')">ENTER GAME</button>
 </div>
 
-<!-- Screen 2 -->
+<!-- 2. Login -->
 <div id="s2" class="screen">
-<h1>LOGIN SCREEN</h1>
-<p>Tap to enter Retro Royale Lobby</p>
-<button type="button" class="btn-main" onclick="goStep(3)">TAP TO START</button>
+<h1>LOGIN</h1>
+<button type="button" class="btn btn-gold" onclick="goStep(3, './ClickClip.mp3')">TAP TO START</button>
 </div>
 
-<!-- Screen 3 -->
+<!-- 3. Lobby -->
 <div id="s3" class="screen">
-<div class="top-hud">
-<div class="hud-pill">
-<div>
-<div id="hudCharName" class="char-badge-title">ADAM</div>
-<div id="hudCharSkill" class="char-badge-skill">Skill: No Skill</div>
+<div class="hud-top">
+<div class="box-dark">
+<div id="hudName" class="title-gold">ADAM</div>
+<div id="hudSkill" class="sub-text">Skill: No Skill</div>
 </div>
-</div>
-<div class="hud-pill">
-<button type="button" class="close-btn" onclick="toggleMute()">🔊 Audio</button>
+<div class="box-dark">
+<button id="muteBtn" type="button" class="small-btn" onclick="toggleMute()">🔊 Audio</button>
 </div>
 </div>
 
-<div class="left-dock">
-<button type="button" class="ff-side-btn" onclick="toggleDrawer()">
-<span>👤</span>
-<span>CHARACTER</span>
-</button>
-</div>
+<button type="button" class="left-btn" onclick="togglePanel()">👤 CHARACTER</button>
 
-<div id="charDrawer" class="char-drawer">
-<div class="drawer-header">
+<div id="panel" class="panel">
+<div class="panel-head">
 <span>CHARACTERS</span>
-<button type="button" class="close-btn" onclick="toggleDrawer()">✕</button>
+<button type="button" class="small-btn" onclick="togglePanel()">✕</button>
 </div>
 <div id="charList"></div>
 </div>
 
-<div id="stage3d" class="stage-3d">
-<div id="modelStatus" class="model-status">3D Character लोड हो रहा है...</div>
+<div class="stage">
+<div id="status" class="status">3D मॉडल लोड हो रहा है...</div>
+<model-viewer
+id="mv"
+src="./Adam_Lobby.glb"
+alt="Lobby Character"
+auto-rotate
+camera-controls
+camera-orbit="0deg 78deg auto"
+field-of-view="34deg"
+exposure="1.4"
+shadow-intensity="1">
+</model-viewer>
 </div>
 
-<div class="bottom-right-dock">
-<div id="startHint" class="start-note">Ready: ADAM</div>
-<button type="button" class="ff-start-btn" onclick="onStartClick()">START</button>
+<div class="right-bottom">
+<div id="readyNote" class="box-dark sub-text">Ready: ADAM</div>
+<button type="button" class="start-btn" onclick="onStart()">START</button>
 </div>
 </div>
 
 <script>
-var CHARACTERS = [
-{ id: 'adam', name: 'ADAM', skill: 'No Skill', file: './Adam_Lobby.glb', icon: '' },
-{ id: 'alok', name: 'ALOK', skill: 'Drop the Beat', file: './alok_lobby.glb', icon: './alok_skill_icon.png' },
-{ id: 'andrew', name: 'ANDREW', skill: 'Vest Mastery', file: './andrew_lobby.glb', icon: '' },
-{ id: 'maxim', name: 'MAXIM', skill: 'Gluttony', file: './maxim_lobby.glb', icon: '' },
-{ id: 'eve', name: 'EVE', skill: 'No Skill', file: './eve_lobby.glb', icon: '' }
+var CHARS = [
+{ name: 'ADAM', skill: 'No Skill', file: './Adam_Lobby.glb' },
+{ name: 'ALOK', skill: 'Drop the Beat', file: './alok_lobby.glb' },
+{ name: 'ANDREW', skill: 'Vest Mastery', file: './andrew_lobby.glb' },
+{ name: 'MAXIM', skill: 'Gluttony', file: './maxim_lobby.glb' },
+{ name: 'EVE', skill: 'No Skill', file: './eve_lobby.glb' }
  ];
 
-var isMuted = false;
-var selectedIdx = 0;
-var bgmAudio = null;
-var viewerCreated = false;
+var current = 0;
+var muted = false;
+var bgm = null;
+var mv = document.getElementById('mv');
+var statusEl = document.getElementById('status');
 
-function playSound(src, loop) {
-if (isMuted || !src) return;
+function playClip(src, loop) {
+if (muted || !src) return;
 try {
 var a = new Audio(src);
 a.loop = !!loop;
@@ -233,127 +182,80 @@ return a;
 } catch (e) {}
 }
 
-function goStep(step) {
-document.getElementById('s1').style.display = 'none';
-document.getElementById('s2').style.display = 'none';
-document.getElementById('s3').style.display = 'none';
+function goStep(step, soundSrc) {
+if (soundSrc) playClip(soundSrc, false);
+document.getElementById('s1').style.display = (step === 1) ? 'flex' : 'none';
+document.getElementById('s2').style.display = (step === 2) ? 'flex' : 'none';
+document.getElementById('s3').style.display = (step === 3) ? 'block' : 'none';
 
-if (step === 1) {
-document.getElementById('s1').style.display = 'flex';
-} else if (step === 2) {
-playSound('./splashClip.mp3', false);
-document.getElementById('s2').style.display = 'flex';
-} else if (step === 3) {
-playSound('./ClickClip.mp3', false);
-document.getElementById('s3').style.display = 'block';
-initLobby();
+if (step === 3) {
+renderList();
+pickChar(current, true);
+if (!muted && !bgm) bgm = playClip('./lobby_bgm.mp3', true);
 }
 }
 
-function initLobby() {
-renderCharacterCards();
-if (!viewerCreated) {
-viewerCreated = true;
-var s = document.createElement('script');
-s.type = 'module';
-s.src = 'https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js';
-document.head.appendChild(s);
-
-var mv = document.createElement('model-viewer');
-mv.id = 'mv';
-mv.setAttribute('alt', 'Lobby Character');
-mv.setAttribute('auto-rotate', '');
-mv.setAttribute('camera-controls', '');
-mv.setAttribute('camera-orbit', '0deg 78deg auto');
-mv.setAttribute('field-of-view', '34deg');
-mv.setAttribute('exposure', '1.4');
-mv.setAttribute('shadow-intensity', '1');
-
-var statusEl = document.getElementById('modelStatus');
-mv.addEventListener('load', function () {
-statusEl.style.display = 'none';
-});
-mv.addEventListener('error', function () {
-statusEl.style.display = 'block';
-statusEl.innerText = '3D मॉडल लोड नहीं हो पाया: ' + mv.getAttribute('src');
-});
-
-document.getElementById('stage3d').appendChild(mv);
-}
-selectCharacter(selectedIdx, true);
-if (!isMuted && !bgmAudio) {
-bgmAudio = playSound('./lobby_bgm.mp3', true);
-}
-}
-
-function renderCharacterCards() {
-var listEl = document.getElementById('charList');
-listEl.innerHTML = '';
-for (var i = 0; i < CHARACTERS.length; i++) {
+function renderList() {
+var wrap = document.getElementById('charList');
+wrap.innerHTML = '';
+for (var i = 0; i < CHARS.length; i++) {
 (function (idx) {
-var c = CHARACTERS[idx];
-var btn = document.createElement('button');
-btn.type = 'button';
-btn.className = 'char-card' + (idx === selectedIdx ? ' active' : '');
-btn.onclick = function () { selectCharacter(idx, false); };
-
-var avatarHtml = c.icon
-? '<img src="' + c.icon + '" alt="' + c.name + '" onerror="this.parentNode.innerText='' + c.name.charAt(0) + ''" />'
-: c.name.charAt(0);
-
-btn.innerHTML =
-'<div class="char-avatar">' + avatarHtml + '</div>' +
-'<div class="char-meta">' +
-'<div class="char-name">' + c.name + '</div>' +
-'<div class="char-skill-sub">' + c.skill + '</div>' +
-'</div>';
-listEl.appendChild(btn);
+var c = CHARS[idx];
+var b = document.createElement('button');
+b.type = 'button';
+b.className = 'char-item' + (idx === current ? ' active' : '');
+b.innerHTML = '<b>' + c.name + '</b><span class="sub-text">' + c.skill + '</span>';
+b.onclick = function () { pickChar(idx, false); };
+wrap.appendChild(b);
 })(i);
 }
 }
 
-function selectCharacter(idx, silent) {
-selectedIdx = idx;
-var c = CHARACTERS[selectedIdx];
-if (!silent) playSound('./ClickClip.mp3', false);
+function pickChar(idx, silent) {
+current = idx;
+var c = CHARS[current];
+if (!silent) playClip('./ClickClip.mp3', false);
 
-document.getElementById('hudCharName').innerText = c.name;
-document.getElementById('hudCharSkill').innerText = 'Skill: ' + c.skill;
-document.getElementById('startHint').innerText = 'Ready: ' + c.name;
+document.getElementById('hudName').innerText = c.name;
+document.getElementById('hudSkill').innerText = 'Skill: ' + c.skill;
+document.getElementById('readyNote').innerText = 'Ready: ' + c.name;
 
-var mvEl = document.getElementById('mv');
-var statusEl = document.getElementById('modelStatus');
-if (statusEl) {
 statusEl.style.display = 'block';
 statusEl.innerText = c.name + ' लोड हो रहा है...';
-}
-if (mvEl) {
-mvEl.setAttribute('src', c.file);
-}
-renderCharacterCards();
+mv.setAttribute('src', c.file);
+renderList();
 }
 
-function toggleDrawer() {
-playSound('./ClickClip.mp3', false);
-var d = document.getElementById('charDrawer');
-d.style.display = (d.style.display === 'flex') ? 'none' : 'flex';
+function togglePanel() {
+playClip('./ClickClip.mp3', false);
+var p = document.getElementById('panel');
+p.style.display = (p.style.display === 'flex') ? 'none' : 'flex';
 }
 
 function toggleMute() {
-isMuted = !isMuted;
-if (isMuted && bgmAudio) {
-try { bgmAudio.pause(); } catch (e) {}
-bgmAudio = null;
-} else if (!isMuted && document.getElementById('s3').style.display === 'block') {
-bgmAudio = playSound('./lobby_bgm.mp3', true);
+muted = !muted;
+document.getElementById('muteBtn').innerText = muted ? '🔇 Muted' : '🔊 Audio';
+if (muted && bgm) {
+try { bgm.pause(); } catch (e) {}
+bgm = null;
+} else if (!muted && document.getElementById('s3').style.display === 'block' && !bgm) {
+bgm = playClip('./lobby_bgm.mp3', true);
 }
 }
 
-function onStartClick() {
-playSound('./ClickClip.mp3', false);
-var c = CHARACTERS[selectedIdx];
-document.getElementById('startHint').innerText = c.name + ' Selected — Next Module Ready';
+function onStart() {
+playClip('./ClickClip.mp3', false);
+document.getElementById('readyNote').innerText = CHARS[current].name + ' Selected';
 }
+
+mv.addEventListener('load', function () {
+statusEl.style.display = 'none';
+});
+
+mv.addEventListener('error', function () {
+statusEl.style.display = 'block';
+statusEl.innerText = 'लोड नहीं हो पाया: ' + mv.getAttribute('src');
+});
 </script>
 </body>
 </html>
